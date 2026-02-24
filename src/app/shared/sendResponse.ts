@@ -1,13 +1,13 @@
 import { Response } from "express";
 
-interface ISentResponse<T> {
+interface ISendResponse<T> {
     statusCode: number;
     success: boolean;
     data?: T;
     message?: string;
 }
 
-export const sentResponse = <T>(res: Response, data: ISentResponse<T>) => {
+export const sendResponse = <T>(res: Response, data: ISendResponse<T>) => {
     res.status(data.statusCode).json({
         success: data.success,
         data: data.data,

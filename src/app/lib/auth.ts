@@ -24,5 +24,10 @@ export const auth = betterAuth({
             failedLoginAttempts: { type: "number", required: true, defaultValue: 0 },
             lockedUntil: { type: "date", required: false, defaultValue: null },
         }
+    },
+    trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:5000", process.env.FRONTEND_URL || "http://localhost:3000"],
+
+    advanced: {
+        disableCSRFCheck: true
     }
 });
