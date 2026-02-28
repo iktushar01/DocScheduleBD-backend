@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { Role, UserStatus } from "../../generated/prisma";
-// If your Prisma file is located elsewhere, you can change the path
+import { envVars } from "../../config/env";
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -25,7 +25,7 @@ export const auth = betterAuth({
             lockedUntil: { type: "date", required: false, defaultValue: null },
         }
     },
-    trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:5000", process.env.FRONTEND_URL || "http://localhost:3000"],
+    trustedOrigins: [envVars.BETTER_AUTH_URL || "http://localhost:5000", envVars.FRONTEND_URL || "http://localhost:3000"],
 
     advanced: {
         disableCSRFCheck: true
