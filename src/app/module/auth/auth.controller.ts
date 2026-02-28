@@ -1,7 +1,7 @@
+import { envVars } from "../../../config/env";
 import { catchAsync } from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
 import { AuthService } from "./auth.service";
-import { envVars } from "../../config/env";
 
 const registerPatient = catchAsync(async (req, res) => {
     const { name, email, password } = req.body;
@@ -29,7 +29,7 @@ const loginUser = catchAsync(async (req, res) => {
 
     res.cookie("better-auth.session_token", data.token, {
         httpOnly: true,
-        secure: envVars.NODE_ENV === "production",
+        secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days

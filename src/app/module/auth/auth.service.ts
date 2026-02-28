@@ -14,8 +14,8 @@ interface ILoginUser {
 }
 
 const registerPatient = async (payload: IRegisterPatient) => {
-    const {name, email, password} = payload;
-     
+    const { name, email, password } = payload;
+
     const data = await auth.api.signUpEmail({
         body: {
             name,
@@ -24,28 +24,30 @@ const registerPatient = async (payload: IRegisterPatient) => {
         }
     })
 
-    if(!data.user){
+    if (!data.user) {
         throw new Error("User registration failed")
     }
 
     //:TODO: create patient profile 
-    // const patient = await prisma.$transaction(async (tx) => {
-    //     const user = await tx.user.update({
-    //         where: {
-    //             id: data.user?.id
-    //         },
-    //         data: {
-    //             needPasswordChange: true,
-    //             role: Role.PATIENT,
-    //         }
-    //     })
-    // })
+    const patient = await prisma.$transaction(async (tx) => {
+        const patientTx = await tx.patient.create({
+            data: {
+                userId: data.user.id,
+                name: payload.name,
+                email: payload.email,
+            },
+        });
+        return {
+            ...data,
+            patient: patientTx,
+        };
+    });
 
-    return data
+    return patient;
 }
 
 const loginUser = async (payload: ILoginUser) => {
-    const {email, password} = payload;
+    const { email, password } = payload;
     const data = await auth.api.signInEmail({
         body: {
             email,
@@ -53,15 +55,15 @@ const loginUser = async (payload: ILoginUser) => {
         }
     })
 
-    if(data.user.status === UserStatus.SUSPENDED){
+    if (data.user.status === UserStatus.SUSPENDED) {
         throw new Error("User is suspended")
     }
 
-    if(data.user.isDeleted || data.user.status === UserStatus.DELETED){
+    if (data.user.isDeleted || data.user.status === UserStatus.DELETED) {
         throw new Error("User is deleted")
     }
 
-    if(!data.user){
+    if (!data.user) {
         throw new Error("User login failed")
     }
 
