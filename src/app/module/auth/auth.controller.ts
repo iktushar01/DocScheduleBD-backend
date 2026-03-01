@@ -2,6 +2,7 @@ import { envVars } from "../../../config/env";
 import { catchAsync } from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
 import { AuthService } from "./auth.service";
+import { StatusCodes } from "http-status-codes";
 
 const registerPatient = catchAsync(async (req, res) => {
     const { name, email, password } = req.body;
@@ -16,7 +17,7 @@ const registerPatient = catchAsync(async (req, res) => {
     });
 
     sendResponse(res, {
-        statusCode: 200,
+        statusCode: StatusCodes.OK,
         success: true,
         message: "Patient registered successfully",
         data
@@ -36,7 +37,7 @@ const loginUser = catchAsync(async (req, res) => {
     });
 
     sendResponse(res, {
-        statusCode: 200,
+        statusCode: StatusCodes.OK,
         success: true,
         message: "User logged in successfully",
         data
