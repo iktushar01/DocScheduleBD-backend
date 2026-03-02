@@ -6,9 +6,27 @@ model Speciality {
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
     deletedAt   DateTime?
+    doctorSpecialities DoctorSpeciality[]
 
     @@index([title], name: "specialities_title_idx")
     @@index([deletedAt], name: "specialities_deletedAt_idx")
 
     @@map("specialities")
+}
+
+
+
+model DoctorSpeciality {
+    id String @id @default(uuid())
+    doctorId String
+    specialityId String
+    doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    speciality Speciality @relation(fields: [specialityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+
+    @@unique([doctorId, specialityId])
+
+    @@index([doctorId], name: "doctor_speciality_doctor_idx")
+    @@index([specialityId], name: "doctor_speciality_speciality_idx")
+    @@map("doctor_speciality")
 }
