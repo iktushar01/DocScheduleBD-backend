@@ -31,7 +31,18 @@ const getSingleDoctor = async (id: string) => {
     return result;
 }
 
+const updateDoctor = async (id: string, data: any) => {
+    const result = await prisma.doctor.update({
+        where: {
+            id
+        },
+        data
+    })
+    return result;
+}
+
 export const DoctorService = {
     getAllDoctors,
-    getSingleDoctor
+    getSingleDoctor,
+    updateDoctor
 }
