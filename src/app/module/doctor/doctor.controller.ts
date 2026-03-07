@@ -14,6 +14,18 @@ const getAllDoctors = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
+const getSingleDoctor = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await DoctorService.getSingleDoctor(id as string);
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Doctor retrieved successfully",
+        data: result
+    });
+})
+
 export const DoctorController = {
-    getAllDoctors
+    getAllDoctors,
+    getSingleDoctor
 }
