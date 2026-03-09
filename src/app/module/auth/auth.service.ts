@@ -41,9 +41,33 @@ const registerPatient = async (payload: IRegisterPatient) => {
                     email: payload.email,
                 },
             });
+
+            const accessToken = tokenUtils.getAccessToken({
+                userId: data.user.id,
+                role: data.user.role as Role,
+                name: data.user.name,
+                email: data.user.email,
+                status: data.user.status as UserStatus,
+                isDeleted: !!data.user.isDeleted,
+                emailVerified: data.user.emailVerified,
+            });
+
+            const refreshToken = tokenUtils.getRefreshToken({
+                userId: data.user.id,
+                role: data.user.role as Role,
+                name: data.user.name,
+                email: data.user.email,
+                status: data.user.status as UserStatus,
+                isDeleted: !!data.user.isDeleted,
+                emailVerified: data.user.emailVerified,
+            });
+
             return {
                 ...data,
                 patient: patientTx,
+                accessToken,
+                refreshToken,
+                token: data.token,
             };
         } catch (error) {
             await tx.patient.delete({
@@ -102,6 +126,7 @@ const loginUser = async (payload: ILoginUser) => {
         ...data,
         accessToken,
         refreshToken,
+        token: data.token,
     }
 }
 

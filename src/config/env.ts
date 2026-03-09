@@ -7,9 +7,6 @@ dotenv.config();
 
 
 
-
-
-
 interface EnvConfig {
     PORT: string;
     NODE_ENV: string;
@@ -21,6 +18,9 @@ interface EnvConfig {
     REFRESH_TOKEN_SECRET: string;
     ACCESS_TOKEN_EXPIRES_IN: SignOptions['expiresIn'];
     REFRESH_TOKEN_EXPIRES_IN: SignOptions['expiresIn'];
+    BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN: SignOptions['expiresIn'];
+    BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE: SignOptions['expiresIn'];
+
 }
 
 const requiredEnvVariables = [
@@ -34,6 +34,8 @@ const requiredEnvVariables = [
     "REFRESH_TOKEN_SECRET",
     "ACCESS_TOKEN_EXPIRES_IN",
     "REFRESH_TOKEN_EXPIRES_IN",
+    "BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN",
+    "BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE",
 ];
 
 
@@ -55,6 +57,8 @@ const loadEnvVariables = (): EnvConfig => {
         REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET as string,
         ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN as SignOptions['expiresIn'],
         REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN as SignOptions['expiresIn'],
+        BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN: process.env.BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN as SignOptions['expiresIn'],
+        BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE: process.env.BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE as SignOptions['expiresIn'],
     }
 }
 

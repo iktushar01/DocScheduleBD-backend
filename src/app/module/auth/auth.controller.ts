@@ -1,46 +1,62 @@
 import { envVars } from "../../../config/env";
 import { catchAsync } from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
+import { tokenUtils } from "../../utils/token";
 import { AuthService } from "./auth.service";
 import { StatusCodes } from "http-status-codes";
+import ms, { StringValue } from "ms";
 
 const registerPatient = catchAsync(async (req, res) => {
     const { name, email, password } = req.body;
-    const data = await AuthService.registerPatient({ name, email, password });
 
-    res.cookie("better-auth.session_token", data.token, {
+    const result = await AuthService.registerPatient({ name, email, password });
+
+    const { accessToken, refreshToken, token, ...rest } = result;
+
+    res.cookie("better-auth.session_token", token, {
         httpOnly: true,
         secure: envVars.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        maxAge: ms(envVars.BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN as StringValue),
     });
+
+    tokenUtils.getAccessTokenFromCookie(res, accessToken ?? '');
+    tokenUtils.getRefreshTokenFromCookie(res, refreshToken ?? '');
+    tokenUtils.getBetterAuthAccessToken(res, token ?? '');
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Patient registered successfully",
-        data
+        data: {
+            ...rest,
+            accessToken,
+            refreshToken,
+            token
+        }
     })
 })
 
 const loginUser = catchAsync(async (req, res) => {
     const { email, password } = req.body;
-    const data = await AuthService.loginUser({ email, password });
+    const result = await AuthService.loginUser({ email, password });
+    const { accessToken, refreshToken, token, ...rest } = result;
 
-    res.cookie("better-auth.session_token", data.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    });
+    tokenUtils.getAccessTokenFromCookie(res, accessToken ?? '');
+    tokenUtils.getRefreshTokenFromCookie(res, refreshToken ?? '');
+    tokenUtils.getBetterAuthAccessToken(res, token ?? '');
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
         message: "User logged in successfully",
-        data
+        data: {
+            ...rest,
+            accessToken,
+            refreshToken,
+            token
+        }
     })
 })
 
