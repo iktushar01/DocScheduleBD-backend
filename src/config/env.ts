@@ -8,16 +8,7 @@ dotenv.config();
 
 
 
-// PORT=5000
-// DATABASE_URL="postgresql://neondb_owner:npg_ZCciw6x8aYTE@ep-lucky-moon-aidan1z7-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
-// BETTER_AUTH_SECRET=lJCwCu32NlZ0CpBrSlkshiRjENhEY1i2
-// BETTER_AUTH_URL=http://localhost:5000
-// FRONTEND_URL=http://localhost:5173
-// NODE_ENV=development
-// ACCESS_TOKEN_SECRET=your_access_token_secret
-// REFRESH_TOKEN_SECRET=your_refresh_token_secret
-// ACCESS_TOKEN_EXPIRES_IN=1d
-// REFRESH_TOKEN_EXPIRES_IN=7d
+
 
 interface EnvConfig {
     PORT: string;
