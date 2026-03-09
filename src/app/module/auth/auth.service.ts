@@ -3,6 +3,7 @@ import AppError from "../../errorHelpers/AppError";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
 import { StatusCodes } from "http-status-codes";
+import { tokenUtils } from "../../utils/token";
 
 interface IRegisterPatient {
     name: string;
@@ -78,7 +79,30 @@ const loginUser = async (payload: ILoginUser) => {
         throw new AppError(StatusCodes.UNAUTHORIZED, "User login failed");
     }
 
-    return data
+    const { user } = data;
+    const accessToken = tokenUtils.getAccessToken({
+        userId: user.id,
+        role: user.role,
+        name: user.name,
+        email: user.email,
+        status: user.status,
+        isDeleted: user.isDeleted,
+        emailVerified: user.emailVerified,
+    })
+    const refreshToken = tokenUtils.getRefreshToken({
+        userId: user.id,
+        role: user.role,
+        name: user.name,
+        email: user.email,
+        status: user.status,
+        isDeleted: user.isDeleted,
+        emailVerified: user.emailVerified,
+    })
+    return {
+        ...data,
+        accessToken,
+        refreshToken,
+    }
 }
 
 export const AuthService = {

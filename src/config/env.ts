@@ -1,7 +1,23 @@
 import dotenv from "dotenv";
 import { StatusCodes } from "http-status-codes";
+import { SignOptions } from "jsonwebtoken";
+
 import AppError from "../app/errorHelpers/AppError";
 dotenv.config();
+
+
+
+
+// PORT=5000
+// DATABASE_URL="postgresql://neondb_owner:npg_ZCciw6x8aYTE@ep-lucky-moon-aidan1z7-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+// BETTER_AUTH_SECRET=lJCwCu32NlZ0CpBrSlkshiRjENhEY1i2
+// BETTER_AUTH_URL=http://localhost:5000
+// FRONTEND_URL=http://localhost:5173
+// NODE_ENV=development
+// ACCESS_TOKEN_SECRET=your_access_token_secret
+// REFRESH_TOKEN_SECRET=your_refresh_token_secret
+// ACCESS_TOKEN_EXPIRES_IN=1d
+// REFRESH_TOKEN_EXPIRES_IN=7d
 
 interface EnvConfig {
     PORT: string;
@@ -10,6 +26,10 @@ interface EnvConfig {
     FRONTEND_URL: string;
     DATABASE_URL: string;
     BETTER_AUTH_SECRET: string;
+    ACCESS_TOKEN_SECRET: string;
+    REFRESH_TOKEN_SECRET: string;
+    ACCESS_TOKEN_EXPIRES_IN: SignOptions['expiresIn'];
+    REFRESH_TOKEN_EXPIRES_IN: SignOptions['expiresIn'];
 }
 
 const requiredEnvVariables = [
@@ -19,6 +39,10 @@ const requiredEnvVariables = [
     "FRONTEND_URL",
     "DATABASE_URL",
     "BETTER_AUTH_SECRET",
+    "ACCESS_TOKEN_SECRET",
+    "REFRESH_TOKEN_SECRET",
+    "ACCESS_TOKEN_EXPIRES_IN",
+    "REFRESH_TOKEN_EXPIRES_IN",
 ];
 
 
@@ -36,6 +60,10 @@ const loadEnvVariables = (): EnvConfig => {
         FRONTEND_URL: process.env.FRONTEND_URL as string,
         DATABASE_URL: process.env.DATABASE_URL as string,
         BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET as string,
+        ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET as string,
+        REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET as string,
+        ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN as SignOptions['expiresIn'],
+        REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN as SignOptions['expiresIn'],
     }
 }
 
