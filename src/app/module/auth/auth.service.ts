@@ -1,6 +1,8 @@
 import { Role, User, UserStatus } from "../../../generated/prisma";
+import AppError from "../../errorHelpers/AppError";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
+import { StatusCodes } from "http-status-codes";
 
 interface IRegisterPatient {
     name: string;
@@ -25,7 +27,7 @@ const registerPatient = async (payload: IRegisterPatient) => {
     })
 
     if (!data.user) {
-        throw new Error("User registration failed")
+        throw new AppError(StatusCodes.BAD_REQUEST, "User registration failed");
     }
 
     //:TODO: create patient profile 
@@ -65,15 +67,15 @@ const loginUser = async (payload: ILoginUser) => {
     })
 
     if (data.user.status === UserStatus.SUSPENDED) {
-        throw new Error("User is suspended")
+        throw new AppError(StatusCodes.BAD_REQUEST, "User is suspended");
     }
 
     if (data.user.isDeleted || data.user.status === UserStatus.DELETED) {
-        throw new Error("User is deleted")
+        throw new AppError(StatusCodes.BAD_REQUEST, "User is deleted");
     }
 
     if (!data.user) {
-        throw new Error("User login failed")
+        throw new AppError(StatusCodes.UNAUTHORIZED, "User login failed");
     }
 
     return data

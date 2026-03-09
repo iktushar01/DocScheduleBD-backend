@@ -2,6 +2,8 @@ import { Role, Speciality } from "../../../generated/prisma";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
 import { ICreateDoctorPayload } from "./user.interface";
+import AppError from "../../errorHelpers/AppError";
+import { StatusCodes } from "http-status-codes";
 
 const createDoctor = async (payload: ICreateDoctorPayload) => {
     const specialities: Speciality[] = [];
@@ -12,7 +14,7 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
             }
         });
         if (!speciality) {
-            throw new Error("Speciality with id " + specialityId + " not found");
+            throw new AppError(StatusCodes.BAD_REQUEST, "Speciality with id " + specialityId + " not found");
         }
         specialities.push(speciality);
     }
@@ -23,7 +25,7 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
         }
     });
     if (userExists) {
-        throw new Error("User with email " + payload.doctor.email + " already exists");
+        throw new AppError(StatusCodes.BAD_REQUEST, "User with email " + payload.doctor.email + " already exists");
     }
 
     const doctorExists = await prisma.doctor.findUnique({
@@ -32,7 +34,7 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
         }
     });
     if (doctorExists) {
-        throw new Error("Doctor with email " + payload.doctor.email + " already exists");
+        throw new AppError(StatusCodes.BAD_REQUEST, "Doctor with email " + payload.doctor.email + " already exists");
     }
     const userData = await auth.api.signUpEmail({
         body: {
@@ -127,7 +129,7 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
                 id: userData.user.id
             }
         })
-        throw new Error("Transaction failed");
+        throw new AppError(StatusCodes.BAD_REQUEST, "Transaction failed");
     }
 }
 
