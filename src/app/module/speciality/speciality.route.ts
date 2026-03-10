@@ -1,11 +1,13 @@
 import express from "express";
 import { SpecialityController } from "./speciality.controller";
+import { checkAuth } from "../../middleware/checkAuth";
+import { Role } from "../../../generated/prisma";
 
 const router = express.Router();
 
-router.post("/", SpecialityController.createSpeciality);
+router.post("/", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), SpecialityController.createSpeciality);
 router.get("/", SpecialityController.getAllSpecialities);
-router.patch("/:id", SpecialityController.updateSpeciality);
-router.delete("/:id", SpecialityController.deleteSpeciality);
+router.patch("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), SpecialityController.updateSpeciality);
+router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), SpecialityController.deleteSpeciality);
 
 export const SpecialityRoute = router;
