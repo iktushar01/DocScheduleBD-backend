@@ -1,83 +1,42 @@
-import { z } from "zod";
+import z from "zod";
 import { Gender } from "../../../generated/prisma";
 
 export const createDoctorZodSchema = z.object({
-    password: z
-        .string()
-        .trim()
-        .min(8, "Password must be at least 8 characters")
-        .max(100)
-        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-        .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-        .regex(/[0-9]/, "Password must contain at least one number"),
-
-    specialities: z
-        .array(
-            z.string().uuid("Invalid speciality ID")
-        )
-        .min(1, "At least one speciality is required")
-        .max(10, "Too many specialities"),
-
+    password: z.string("Password is required").min(6, "Password must be at least 6 characters").max(20, "Password must be at most 20 characters"),
     doctor: z.object({
-        name: z
-            .string()
-            .trim()
-            .min(2, "Name must be at least 2 characters")
-            .max(100)
-            .regex(/^[a-zA-Z\s.]+$/, "Name can only contain letters"),
+        name: z.string("Name is required and must be string").min(5, "Name must be at least 5 characters").max(30, "Name must be at most 30 characters"),
 
-        email: z
-            .string()
-            .trim()
-            .email("Invalid email address")
-            .toLowerCase(),
+        email: z.email("Invalid email address"),
 
-        profilePhoto: z
-            .string()
-            .trim()
-            .url("Profile photo must be a valid URL"),
+        contactNumber: z.string("Contact number is required").min(11, "Contact number must be at least 11 characters").max(14, "Contact number must be at most 15 characters"),
 
-        contactNumber: z
-            .string()
-            .trim()
-            .regex(/^[\d\s\-\+]{10,15}$/, "Invalid contact number. Use actual digits (no 'X')."),
+        address: z.string("Address is required").min(10, "Address must be at least 10 characters").max(100, "Address must be at most 100 characters").optional(),
 
-        address: z
-            .string()
-            .trim()
-            .min(5, "Address is too short")
-            .max(200),
+        registrationNumber: z.string("Registration number is required"),
 
-        gender: z.enum([Gender.MALE, Gender.FEMALE]),
+        experience: z.int("Experience must be an integer").nonnegative("Experience cannot be negative").optional(),
 
-        appointmentFee: z
-            .number({
-                error: (issue) => {
-                    if (issue.code === "invalid_type" && issue.input === undefined) {
-                        return "Appointment fee is required";
-                    }
-                    return "Appointment fee must be a number";
-                },
-            })
-            .positive("Appointment fee must be positive")
-            .max(50000, "Fee is too high"),
+        gender: z.enum([Gender.MALE, Gender.FEMALE], "Gender must be either MALE or FEMALE"),
 
-        qualification: z
-            .string()
-            .trim()
-            .min(2, "Qualification required")
-            .max(100),
+        appointmentFee: z.number("Appointment fee must be a number").nonnegative("Appointment fee cannot be negative"),
 
-        currentWorkingPlace: z
-            .string()
-            .trim()
-            .min(2, "Working place required")
-            .max(150),
+        qualification: z.string("Qualification is required").min(2, "Qualification must be at least 2 characters").max(50, "Qualification must be at most 50 characters"),
 
-        designation: z
-            .string()
-            .trim()
-            .min(2, "Designation required")
-            .max(100),
+        currentWorkingPlace: z.string("Current working place is required").min(2, "Current working place must be at least 2 characters").max(50, "Current working place must be at most 50 characters"),
+
+        designation: z.string("Designation is required").min(2, "Designation must be at least 2 characters").max(50, "Designation must be at most 50 characters"),
+
     }),
-});
+    specialties: z.array(z.uuid(), "Specialties must be an array of strings").min(1, "At least one specialty is required")
+})
+
+export const createAdminZodSchema = z.object({
+    password: z.string("Password is required").min(6, "Password must be at least 6 characters").max(20, "Password must be at most 20 characters"),
+    admin: z.object({
+        name: z.string("Name is required and must be string").min(5, "Name must be at least 5 characters").max(30, "Name must be at most 30 characters"),
+        email: z.email("Invalid email address"),
+        contactNumber: z.string("Contact number is required").min(11, "Contact number must be at least 11 characters").max(14, "Contact number must be at most 15 characters").optional(),
+        profilePhoto: z.url("Profile photo must be a valid URL").optional(),
+    }),
+    role: z.enum(["ADMIN", "SUPER_ADMIN"], "Role must be either ADMIN or SUPER_ADMIN")
+})
