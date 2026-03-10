@@ -28,6 +28,7 @@ model Doctor {
     user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
     specialities DoctorSpeciality[]
+    doctorSchedules DoctorSchedules[]
 
     @@index([email], name: "doctor_email_idx")
     @@index([isDeleted], name: "doctor_isDeleted_idx")
