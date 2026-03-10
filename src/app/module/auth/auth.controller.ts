@@ -6,6 +6,7 @@ import { AuthService } from "./auth.service";
 import { StatusCodes } from "http-status-codes";
 import ms, { StringValue } from "ms";
 import { IRequestUser } from "../admin/admin.interface";
+import AppError from "../../errorHelpers/AppError";
 
 const registerPatient = catchAsync(async (req, res) => {
     const { name, email, password } = req.body;
@@ -72,8 +73,34 @@ const getMe = catchAsync(async (req, res) => {
     })
 })
 
+const getNewTokens = catchAsync(async (req, res) => {
+    const oldRefreshToken = req.cookies.refreshToken;
+    const sessionToken = req.cookies.sessionToken;
+    if(!oldRefreshToken){
+        throw new AppError(StatusCodes.UNAUTHORIZED, "Refresh token not found");
+    }
+    const result = await AuthService.getNewTokens(oldRefreshToken, sessionToken);
+    const { accessToken, refreshToken, updatedToken } = result;
+
+    tokenUtils.getAccessTokenFromCookie(res, accessToken);
+    tokenUtils.getRefreshTokenFromCookie(res, refreshToken);
+    tokenUtils.getBetterAuthAccessToken(res, updatedToken);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Tokens fetched successfully",
+        data: {
+            accessToken,
+            refreshToken,
+            updatedToken
+        }
+    })
+})
+
 export const AuthController = {
     registerPatient,
     loginUser,
-    getMe
+    getMe,
+    getNewTokens
 }

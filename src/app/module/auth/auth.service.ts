@@ -5,6 +5,8 @@ import { prisma } from "../../lib/prisma";
 import { StatusCodes } from "http-status-codes";
 import { tokenUtils } from "../../utils/token";
 import { IRequestUser } from "../admin/admin.interface";
+import { jwtUtils } from "../../utils/jwt";
+import { envVars } from "../../../config/env";
 
 
 interface IRegisterPatient {
@@ -164,8 +166,68 @@ const getMe = async (user : IRequestUser) => {
     return isUserExist;
 }
 
+const getNewTokens = async (refreshToken : string, sessionToken : string) => {
+    const isSessionTokenExist = await prisma.session.findUnique({
+        where: {
+            token: sessionToken
+        },
+        include: {
+            user: true,
+        }
+    })
+    if(!isSessionTokenExist){
+        throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid session token");
+    }
+    
+    const varifiedRefreshToken = jwtUtils.verifyToken(refreshToken, envVars.REFRESH_TOKEN_SECRET);
+
+    if (!varifiedRefreshToken.success || !varifiedRefreshToken.decoded) {
+        throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid refresh token");
+    }
+
+    const { decoded } = varifiedRefreshToken;
+
+    const newAccessToken = tokenUtils.getAccessToken({
+        userId: decoded.userId,
+        role: decoded.role,
+        name: decoded.name,
+        email: decoded.email,
+        status: decoded.status,
+        isDeleted: decoded.isDeleted,
+        emailVerified: decoded.emailVerified,
+    })
+    const newRefreshToken = tokenUtils.getRefreshToken({
+        userId: decoded.userId,
+        role: decoded.role,
+        name: decoded.name,
+        email: decoded.email,
+        status: decoded.status,
+        isDeleted: decoded.isDeleted,
+        emailVerified: decoded.emailVerified,
+    })
+
+
+    const {token} = await prisma.session.update({
+        where: {
+            token: sessionToken
+        },
+        data: {
+            token: newRefreshToken,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            updatedAt: new Date(),
+        }
+    })
+    return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+        updatedToken: token,
+    }
+    
+}
+
 export const AuthService = {
     registerPatient,
     loginUser,
-    getMe
+    getMe,
+    getNewTokens
 }
