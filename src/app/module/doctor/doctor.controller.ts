@@ -14,38 +14,51 @@ const getAllDoctors = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
-const getSingleDoctor = catchAsync(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const result = await DoctorService.getSingleDoctor(id as string);
-    sendResponse(res, {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Doctor retrieved successfully",
-        data: result
-    });
-})
+const getSingleDoctor = catchAsync(
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
 
-const updateDoctor = catchAsync(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const result = await DoctorService.updateDoctor(id as string, req.body);
-    sendResponse(res, {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Doctor updated successfully",
-        data: result
-    });
-})
+        const doctor = await DoctorService.getDoctorById(id as string);
 
-const deleteDoctor = catchAsync(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const result = await DoctorService.deleteDoctor(id as string);
-    sendResponse(res, {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Doctor deleted successfully",
-        data: result
-    });
-})
+        sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: "Doctor fetched successfully",
+            data: doctor,
+        })
+    }
+)
+
+const updateDoctor = catchAsync(
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const payload = req.body;
+
+        const updatedDoctor = await DoctorService.updateDoctor(id as string, payload);
+
+        sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: "Doctor updated successfully",
+            data: updatedDoctor,
+        })
+    }
+)
+
+const deleteDoctor = catchAsync(
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
+
+        const result = await DoctorService.deleteDoctor(id as string);
+
+        sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: "Doctor deleted successfully",
+            data: result,
+        })
+    }
+)
 
 export const DoctorController = {
     getAllDoctors,

@@ -24,12 +24,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 7.4.1
- * Query Engine version: 55ae170b1ced7fc6ed07a15f110549408c501bb3
+ * Prisma Client JS version: 7.4.2
+ * Query Engine version: 94a226be1cf2967af2541cca5529f0f7ba866919
  */
 Prisma.prismaVersion = {
-  client: "7.4.1",
-  engine: "55ae170b1ced7fc6ed07a15f110549408c501bb3"
+  client: "7.4.2",
+  engine: "94a226be1cf2967af2541cca5529f0f7ba866919"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -120,20 +120,46 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.SpecialityScalarFieldEnum = {
+exports.Prisma.SpecialtyScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
   icon: 'icon',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  isDeleted: 'isDeleted',
   deletedAt: 'deletedAt'
 };
 
-exports.Prisma.DoctorSpecialityScalarFieldEnum = {
+exports.Prisma.DoctorSpecialtyScalarFieldEnum = {
   id: 'id',
   doctorId: 'doctorId',
-  specialityId: 'specialityId'
+  specialtyId: 'specialtyId'
+};
+
+exports.Prisma.AdminScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  profilePhoto: 'profilePhoto',
+  contactNumber: 'contactNumber',
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt',
+  userId: 'userId'
+};
+
+exports.Prisma.AppointmentScalarFieldEnum = {
+  id: 'id',
+  videoCallingId: 'videoCallingId',
+  status: 'status',
+  paymentStatus: 'paymentStatus',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  patientId: 'patientId',
+  doctorId: 'doctorId',
+  scheduleId: 'scheduleId'
 };
 
 exports.Prisma.UserScalarFieldEnum = {
@@ -141,17 +167,12 @@ exports.Prisma.UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   emailVerified: 'emailVerified',
-  image: 'image',
   role: 'role',
   status: 'status',
   needPasswordChange: 'needPasswordChange',
   isDeleted: 'isDeleted',
   deletedAt: 'deletedAt',
-  lastLogin: 'lastLogin',
-  lastIpAddress: 'lastIpAddress',
-  lastUserAgent: 'lastUserAgent',
-  failedLoginAttempts: 'failedLoginAttempts',
-  lockedUntil: 'lockedUntil',
+  image: 'image',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -209,10 +230,18 @@ exports.Prisma.DoctorScalarFieldEnum = {
   currentWorkingPlace: 'currentWorkingPlace',
   designation: 'designation',
   averageRating: 'averageRating',
-  totalReviews: 'totalReviews',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId'
+};
+
+exports.Prisma.MedicalReportScalarFieldEnum = {
+  id: 'id',
+  reportName: 'reportName',
+  reportLink: 'reportLink',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  patientId: 'patientId'
 };
 
 exports.Prisma.PatientScalarFieldEnum = {
@@ -229,9 +258,87 @@ exports.Prisma.PatientScalarFieldEnum = {
   userId: 'userId'
 };
 
+exports.Prisma.PatientHealthDataScalarFieldEnum = {
+  id: 'id',
+  gender: 'gender',
+  dateOfBirth: 'dateOfBirth',
+  bloodGroup: 'bloodGroup',
+  hasAllergies: 'hasAllergies',
+  hasDiabetes: 'hasDiabetes',
+  height: 'height',
+  weight: 'weight',
+  smokingStatus: 'smokingStatus',
+  dietaryPreferences: 'dietaryPreferences',
+  pregnancyStatus: 'pregnancyStatus',
+  mentalHealthHistory: 'mentalHealthHistory',
+  immunizationStatus: 'immunizationStatus',
+  hasPastSurgeries: 'hasPastSurgeries',
+  recentAnxiety: 'recentAnxiety',
+  recentDepression: 'recentDepression',
+  maritalStatus: 'maritalStatus',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  patientId: 'patientId'
+};
+
+exports.Prisma.PaymentScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  transactionId: 'transactionId',
+  stripeEventId: 'stripeEventId',
+  status: 'status',
+  paymentGatewayData: 'paymentGatewayData',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  appointmentId: 'appointmentId'
+};
+
+exports.Prisma.PrescriptionScalarFieldEnum = {
+  id: 'id',
+  followUpDate: 'followUpDate',
+  instructions: 'instructions',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  appointmentId: 'appointmentId',
+  patientId: 'patientId',
+  doctorId: 'doctorId'
+};
+
+exports.Prisma.ReviewScalarFieldEnum = {
+  id: 'id',
+  rating: 'rating',
+  comment: 'comment',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  appointmentId: 'appointmentId',
+  patientId: 'patientId',
+  doctorId: 'doctorId'
+};
+
+exports.Prisma.ScheduleScalarFieldEnum = {
+  id: 'id',
+  startDateTime: 'startDateTime',
+  endDateTime: 'endDateTime',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DoctorSchedulesScalarFieldEnum = {
+  doctorId: 'doctorId',
+  scheduleId: 'scheduleId',
+  isBooked: 'isBooked',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -243,6 +350,24 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+exports.AppointmentStatus = exports.$Enums.AppointmentStatus = {
+  SCHEDULED: 'SCHEDULED',
+  INPROGRESS: 'INPROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELED: 'CANCELED'
+};
+
+exports.PaymentStatus = exports.$Enums.PaymentStatus = {
+  PAID: 'PAID',
+  UNPAID: 'UNPAID'
+};
+
 exports.Role = exports.$Enums.Role = {
   PATIENT: 'PATIENT',
   DOCTOR: 'DOCTOR',
@@ -263,15 +388,35 @@ exports.Gender = exports.$Enums.Gender = {
   OTHER: 'OTHER'
 };
 
+exports.BloodGroup = exports.$Enums.BloodGroup = {
+  A_POSITIVE: 'A_POSITIVE',
+  A_NEGATIVE: 'A_NEGATIVE',
+  B_POSITIVE: 'B_POSITIVE',
+  B_NEGATIVE: 'B_NEGATIVE',
+  AB_POSITIVE: 'AB_POSITIVE',
+  AB_NEGATIVE: 'AB_NEGATIVE',
+  O_POSITIVE: 'O_POSITIVE',
+  O_NEGATIVE: 'O_NEGATIVE'
+};
+
 exports.Prisma.ModelName = {
-  Speciality: 'Speciality',
-  DoctorSpeciality: 'DoctorSpeciality',
+  Specialty: 'Specialty',
+  DoctorSpecialty: 'DoctorSpecialty',
+  Admin: 'Admin',
+  Appointment: 'Appointment',
   User: 'User',
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
   Doctor: 'Doctor',
-  Patient: 'Patient'
+  MedicalReport: 'MedicalReport',
+  Patient: 'Patient',
+  PatientHealthData: 'PatientHealthData',
+  Payment: 'Payment',
+  Prescription: 'Prescription',
+  Review: 'Review',
+  Schedule: 'Schedule',
+  DoctorSchedules: 'DoctorSchedules'
 };
 
 /**

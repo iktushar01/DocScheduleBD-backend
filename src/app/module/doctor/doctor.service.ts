@@ -1,105 +1,162 @@
+import { StatusCodes } from "http-status-codes";
+import { UserStatus } from "../../../generated/prisma";
+import AppError from "../../errorHelpers/AppError";
 import { prisma } from "../../lib/prisma";
+import { IUpdateDoctorPayload } from "./doctor.interface";
 
 const getAllDoctors = async () => {
-    const result = await prisma.doctor.findMany({
-        include: {
-            user: true,
-            specialities: {
-                include: {
-                    speciality: true
-                }
-            }
-        }
-    })
-    return result;
-}
-
-const getSingleDoctor = async (id: string) => {
-    const result = await prisma.doctor.findUnique({
+    const doctors = await prisma.doctor.findMany({
         where: {
-            id
+            isDeleted: false,
         },
         include: {
             user: true,
-            specialities: {
+            specialties: {
                 include: {
-                    speciality: true
+                    specialty: true
                 }
             }
         }
     })
-    return result;
+    return doctors;
 }
 
-const updateDoctor = async (id: string, payload: any) => {
-    const { password, specialities, doctor: doctorData } = payload;
-
-    const doctorInfo = await prisma.doctor.findUniqueOrThrow({
-        where: { id },
-    });
-
-    const result = await prisma.$transaction(async (tx) => {
-        // 1. Update Password if provided
-        if (password) {
-            await tx.account.updateMany({
-                where: { userId: doctorInfo.userId },
-                data: { password },
-            });
-        }
-
-        // 2. Update Doctor basic info
-        const updatedDoctor = await tx.doctor.update({
-            where: { id },
-            data: doctorData,
-        });
-
-        // 3. Update Specialities if provided
-        if (specialities && Array.isArray(specialities)) {
-            // Delete existing
-            await tx.doctorSpeciality.deleteMany({
-                where: { doctorId: id },
-            });
-
-            // Create new
-            const doctorSpecialityData = specialities.map((specialityId: string) => ({
-                doctorId: id,
-                specialityId,
-            }));
-
-            await tx.doctorSpeciality.createMany({
-                data: doctorSpecialityData,
-            });
-        }
-
-        // 4. Return updated doctor with relations
-        return await tx.doctor.findUnique({
-            where: { id },
-            include: {
-                user: true,
-                specialities: {
-                    include: {
-                        speciality: true,
-                    },
-                },
-            },
-        });
-    });
-
-    return result;
-};
-
-const deleteDoctor = async (id: string) => {
-    const result = await prisma.doctor.delete({
+const getDoctorById = async (id: string) => {
+    const doctor = await prisma.doctor.findUnique({
         where: {
-            id
+            id,
+            isDeleted: false,
+        },
+        include: {
+            user: true,
+            specialties: {
+                include: {
+                    specialty: true
+                }
+            },
+            appointments: {
+                include: {
+                    patient: true,
+                    schedule: true,
+                    prescription: true,
+                }
+            },
+            doctorSchedules: {
+                include: {
+                    schedule: true,
+                }
+            },
+            reviews: true
         }
     })
-    return result;
+    return doctor;
+}
+
+const updateDoctor = async (id: string, payload: IUpdateDoctorPayload) => {
+    const isDoctorExist = await prisma.doctor.findUnique({
+        where: {
+            id,
+        }
+    })
+
+    if (!isDoctorExist) {
+        throw new AppError(StatusCodes.NOT_FOUND, "Doctor not found");
+    }
+
+    const { doctor: doctorData, specialties } = payload;
+
+    await prisma.$transaction(async (tx) => {
+        if (doctorData) {
+            await tx.doctor.update({
+                where: {
+                    id,
+                },
+                data: {
+                    ...doctorData,
+                }
+            })
+        }
+
+        if (specialties && specialties.length > 0) {
+            for (const specialty of specialties) {
+                const { specialtyId, shouldDelete } = specialty;
+                if (shouldDelete) {
+                    await tx.doctorSpecialty.delete({
+                        where: {
+                            doctorId_specialtyId: {
+                                doctorId: id,
+                                specialtyId,
+                            }
+                        }
+                    })
+                } else {
+                    await tx.doctorSpecialty.upsert({
+                        where: {
+                            doctorId_specialtyId: {
+                                doctorId: id,
+                                specialtyId,
+                            }
+                        },
+                        create: {
+                            doctorId: id,
+                            specialtyId,
+                        },
+                        update: {}
+                    })
+                }
+            }
+        }
+    })
+
+    const doctor = await getDoctorById(id);
+
+    return doctor;
+}
+
+//soft delete
+const deleteDoctor = async (id: string) => {
+    const isDoctorExist = await prisma.doctor.findUnique({
+        where: { id },
+        include: { user: true }
+    })
+
+    if (!isDoctorExist) {
+        throw new AppError(StatusCodes.NOT_FOUND, "Doctor not found");
+    }
+
+    await prisma.$transaction(async (tx) => {
+        await tx.doctor.update({
+            where: { id },
+            data: {
+                isDeleted: true,
+                deletedAt: new Date(),
+            },
+        })
+
+        await tx.user.update({
+            where: { id: isDoctorExist.userId },
+            data: {
+                isDeleted: true,
+                deletedAt: new Date(),
+                status: UserStatus.DELETED // Optional: you may also want to block the user
+            },
+        })
+
+        await tx.session.deleteMany({
+            where: { userId: isDoctorExist.userId }
+        })
+
+        await tx.doctorSpecialty.deleteMany({
+            where: { doctorId: id }
+        })
+    })
+
+    return { message: "Doctor deleted successfully" };
 }
 
 export const DoctorService = {
     getAllDoctors,
-    getSingleDoctor,
+    getDoctorById,
     updateDoctor,
-    deleteDoctor
+    deleteDoctor,
 }
