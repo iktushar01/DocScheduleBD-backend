@@ -5,6 +5,7 @@ import { tokenUtils } from "../../utils/token";
 import { AuthService } from "./auth.service";
 import { StatusCodes } from "http-status-codes";
 import ms, { StringValue } from "ms";
+import { IRequestUser } from "../admin/admin.interface";
 
 const registerPatient = catchAsync(async (req, res) => {
     const { name, email, password } = req.body;
@@ -60,7 +61,19 @@ const loginUser = catchAsync(async (req, res) => {
     })
 })
 
+const getMe = catchAsync(async (req, res) => {
+    const user = req.user as IRequestUser;
+    const result = await AuthService.getMe(user);
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "User fetched successfully",
+        data: result,
+    })
+})
+
 export const AuthController = {
     registerPatient,
-    loginUser
+    loginUser,
+    getMe
 }
