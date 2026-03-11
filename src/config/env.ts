@@ -26,6 +26,7 @@ interface EnvConfig {
     EMAIL_USER: string;
     EMAIL_PASSWORD: string;
     EMAIL_FROM: string;
+    EXPIRE_OTP_TIME: string;
 }
 
 const requiredEnvVariables = [
@@ -47,6 +48,7 @@ const requiredEnvVariables = [
     "EMAIL_USER",
     "EMAIL_PASSWORD",
     "EMAIL_FROM",
+    "EXPIRE_OTP_TIME",
 ];
 
 
@@ -76,6 +78,7 @@ const loadEnvVariables = (): EnvConfig => {
         EMAIL_USER: process.env.EMAIL_USER as string,
         EMAIL_PASSWORD: process.env.EMAIL_PASSWORD as string,
         EMAIL_FROM: process.env.EMAIL_FROM as string,
+        EXPIRE_OTP_TIME: process.env.EXPIRE_OTP_TIME as string,
     }
 }
 

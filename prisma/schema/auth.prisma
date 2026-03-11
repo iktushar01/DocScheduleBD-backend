@@ -16,6 +16,11 @@ model User {
   patient            Patient?
   doctor             Doctor?
   admin              Admin?
+  lastLogin           DateTime?
+  lastIpAddress       String?
+  lastUserAgent       String?
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
 
   @@unique([email])
   @@map("user")

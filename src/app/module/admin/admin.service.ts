@@ -1,9 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 import { UserStatus } from "../../../generated/prisma";
 import AppError from "../../errorHelpers/AppError";
-// import { IRequestUser } from "../../interfaces/requestUser.interface";
 import { prisma } from "../../lib/prisma";
-import { IRequestUser, IUpdateAdminPayload } from "./admin.interface";
+import { IRequestUser } from "../auth/auth.interface";
+import { IUpdateAdminPayload } from "./admin.interface";
 
 const getAllAdmins = async () => {
     const admins = await prisma.admin.findMany({

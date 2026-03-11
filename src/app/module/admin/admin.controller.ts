@@ -3,7 +3,7 @@ import { catchAsync } from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
 import { AdminService } from "./admin.service";
 import { StatusCodes } from "http-status-codes";
-import { IRequestUser } from "./admin.interface";
+import { IRequestUser } from "../auth/auth.interface";
 
 const getAllAdmins = catchAsync(
     async (req: Request, res: Response) => {
