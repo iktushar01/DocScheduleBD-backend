@@ -4,7 +4,12 @@ import cookieParser from "cookie-parser";
 import { IndexRoute } from "./routes";
 import { globalErrorhandler } from "./middleware/globalErrorhandler";
 import { notFound } from "./middleware/notFound";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth";
 const app = express();
+
+
+app.use("/api/auth", toNodeHandler(auth))
 
 app.use(cors());
 app.use(express.json());

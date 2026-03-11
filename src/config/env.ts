@@ -27,6 +27,9 @@ interface EnvConfig {
     EMAIL_PASSWORD: string;
     EMAIL_FROM: string;
     EXPIRE_OTP_TIME: string;
+    GOOGLE_CLIENT_ID: string;
+    GOOGLE_CLIENT_SECRET: string;
+    GOOGLE_CALLBACK_URL: string;
 }
 
 const requiredEnvVariables = [
@@ -49,6 +52,9 @@ const requiredEnvVariables = [
     "EMAIL_PASSWORD",
     "EMAIL_FROM",
     "EXPIRE_OTP_TIME",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "GOOGLE_CALLBACK_URL",
 ];
 
 
@@ -79,6 +85,9 @@ const loadEnvVariables = (): EnvConfig => {
         EMAIL_PASSWORD: process.env.EMAIL_PASSWORD as string,
         EMAIL_FROM: process.env.EMAIL_FROM as string,
         EXPIRE_OTP_TIME: process.env.EXPIRE_OTP_TIME as string,
+        GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
+        GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
+        GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
     }
 }
 

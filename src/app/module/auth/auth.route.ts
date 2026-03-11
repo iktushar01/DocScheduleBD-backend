@@ -2,6 +2,7 @@ import { Router } from "express";
 import { AuthController } from "./auth.controller";
 import { checkAuth } from "../../middleware/checkAuth";
 import { Role } from "../../../generated/prisma";
+
 const router = Router();
 
 router.post("/register", AuthController.registerPatient);
@@ -13,5 +14,9 @@ router.post("/logout", checkAuth(Role.PATIENT, Role.DOCTOR, Role.ADMIN, Role.SUP
 router.post("/verify-email", AuthController.verifyEmail);
 router.post("/forget-password", AuthController.forgetPassword);
 router.post("/reset-password", AuthController.resetPassword);
+
+router.get("/login/google", AuthController.googleLogin);
+router.get("/google/success", AuthController.googleLoginSuccess);
+router.get("/oauth/error", AuthController.handleOAuthError);
 
 export const AuthRoute = router; 
