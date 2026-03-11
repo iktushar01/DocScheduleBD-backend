@@ -34,7 +34,7 @@ export const sendEmail = async ({subject, to, templateName, templateData, attach
         const templatePath = path.resolve(process.cwd(), `src/app/templates/${templateName}.ejs`);
         const html = await ejs.renderFile(templatePath, templateData);
         const info = await transporter.sendMail({
-            from: envVars.EMAIL_FROM,
+            from: `"DocScheduleBD" <${envVars.EMAIL_USER}>`,
             to: to,
             subject: subject,
             html : html,
