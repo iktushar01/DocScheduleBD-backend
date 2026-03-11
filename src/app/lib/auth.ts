@@ -4,6 +4,7 @@ import { prisma } from "./prisma";
 import { Role, UserStatus } from "../../generated/prisma";
 import { envVars } from "../../config/env";
 import ms, { StringValue } from "ms";
+import { bearer } from "better-auth/plugins";
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -26,6 +27,10 @@ export const auth = betterAuth({
             lockedUntil: { type: "date", required: false, defaultValue: null },
         }
     },
+
+    plugins: [
+        bearer()
+],
 
     session: {
         expiresIn: ms(envVars.BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN as StringValue) / 1000,

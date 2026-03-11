@@ -5,8 +5,9 @@ import { tokenUtils } from "../../utils/token";
 import { AuthService } from "./auth.service";
 import { StatusCodes } from "http-status-codes";
 import ms, { StringValue } from "ms";
-import { IRequestUser } from "../admin/admin.interface";
 import AppError from "../../errorHelpers/AppError";
+import { IRequestUser } from "./auth.interface";
+import { Request, Response } from "express";
 
 const registerPatient = catchAsync(async (req, res) => {
     const { name, email, password } = req.body;
@@ -100,9 +101,35 @@ const getNewTokens = catchAsync(async (req, res) => {
     })
 })
 
+
+const changePassword = catchAsync(
+    async (req: Request, res: Response) => {
+        const payload = req.body;
+        const betterAuthSessionToken = req.cookies["better-auth.session_token"];
+
+        const result = await AuthService.changePassword(payload, betterAuthSessionToken);
+
+        const { accessToken, refreshToken, token } = result;
+
+        tokenUtils.getAccessTokenFromCookie(res, accessToken);
+        tokenUtils.getRefreshTokenFromCookie(res, refreshToken);
+        tokenUtils.getBetterAuthAccessToken(res, token as string);
+
+        sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: "Password changed successfully",
+            data: result,
+        });
+    }
+)
+
+
+
 export const AuthController = {
     registerPatient,
     loginUser,
     getMe,
-    getNewTokens
+    getNewTokens,
+    changePassword,
 }
