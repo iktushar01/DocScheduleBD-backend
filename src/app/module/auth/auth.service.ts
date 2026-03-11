@@ -167,6 +167,10 @@ const getMe = async (user : IRequestUser) => {
 }
 
 const getNewTokens = async (refreshToken : string, sessionToken : string) => {
+    if (!refreshToken || !sessionToken) {
+        throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid request. Tokens are missing.");
+    }
+
     const isSessionTokenExist = await prisma.session.findUnique({
         where: {
             token: sessionToken
