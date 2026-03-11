@@ -8,6 +8,7 @@ import ms, { StringValue } from "ms";
 import AppError from "../../errorHelpers/AppError";
 import { IRequestUser } from "./auth.interface";
 import { Request, Response } from "express";
+import { cookieUtils } from "../../utils/cookies";
 
 const registerPatient = catchAsync(async (req, res) => {
     const { name, email, password } = req.body;
@@ -125,6 +126,35 @@ const changePassword = catchAsync(
 )
 
 
+const logoutUser = catchAsync(
+    async (req: Request, res: Response) => {
+        const betterAuthSessionToken = req.cookies["better-auth.session_token"];
+        const result = await AuthService.logoutUser(betterAuthSessionToken);
+        cookieUtils.clearCookie(res, 'accessToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
+        cookieUtils.clearCookie(res, 'refreshToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
+        cookieUtils.clearCookie(res, 'better-auth.session_token', {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
+
+        sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: "User logged out successfully",
+            data: result,
+        });
+    }
+)
+
 
 export const AuthController = {
     registerPatient,
@@ -132,4 +162,5 @@ export const AuthController = {
     getMe,
     getNewTokens,
     changePassword,
+    logoutUser,
 }
