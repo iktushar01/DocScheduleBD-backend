@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { SignOptions } from "jsonwebtoken";
 
 import AppError from "../app/errorHelpers/AppError";
-dotenv.config();
+dotenv.config()
 
 
 
@@ -20,7 +20,12 @@ interface EnvConfig {
     REFRESH_TOKEN_EXPIRES_IN: SignOptions['expiresIn'];
     BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN: SignOptions['expiresIn'];
     BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE: SignOptions['expiresIn'];
-
+    EMAIL_HOST: string;
+    EMAIL_PORT: number;
+    EMAIL_SECURE: boolean;
+    EMAIL_USER: string;
+    EMAIL_PASSWORD: string;
+    EMAIL_FROM: string;
 }
 
 const requiredEnvVariables = [
@@ -36,6 +41,12 @@ const requiredEnvVariables = [
     "REFRESH_TOKEN_EXPIRES_IN",
     "BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN",
     "BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE",
+    "EMAIL_HOST",
+    "EMAIL_PORT",
+    "EMAIL_SECURE",
+    "EMAIL_USER",
+    "EMAIL_PASSWORD",
+    "EMAIL_FROM",
 ];
 
 
@@ -59,6 +70,12 @@ const loadEnvVariables = (): EnvConfig => {
         REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN as SignOptions['expiresIn'],
         BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN: process.env.BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN as SignOptions['expiresIn'],
         BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE: process.env.BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE as SignOptions['expiresIn'],
+        EMAIL_HOST: process.env.EMAIL_HOST as string,
+        EMAIL_PORT: Number(process.env.EMAIL_PORT),
+        EMAIL_SECURE: process.env.EMAIL_SECURE === 'true',
+        EMAIL_USER: process.env.EMAIL_USER as string,
+        EMAIL_PASSWORD: process.env.EMAIL_PASSWORD as string,
+        EMAIL_FROM: process.env.EMAIL_FROM as string,
     }
 }
 
