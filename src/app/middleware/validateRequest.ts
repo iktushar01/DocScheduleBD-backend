@@ -1,17 +1,21 @@
 import { NextFunction, Request, Response } from "express";
-import { z } from "zod";
-import { StatusCodes } from "http-status-codes";
+import z from "zod";
 
-export const validateRequest = (ZodObject: z.ZodObject<any>) => {
+export const validateRequest = (zodSchema: z.ZodObject) => {
     return (req: Request, res: Response, next: NextFunction) => {
-        const parseResult = ZodObject.safeParse(req.body);
-        if (!parseResult.success) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                success: false,
-                message: "Validation failed",
-                error: parseResult.error.issues,
-            });
+        if(req.body.data){
+            req.body = JSON.parse(req.body.data)
         }
+
+        const parsedResult = zodSchema.safeParse(req.body)
+
+        if (!parsedResult.success) {
+            next(parsedResult.error)
+        }
+
+        //sanitizing the data
+        req.body = parsedResult.data;
+
         next();
     }
 }
