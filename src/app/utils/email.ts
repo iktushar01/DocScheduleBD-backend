@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { envVars } from "../../config/env";
+import { envVars } from "../config/env";
 import AppError from "../errorHelpers/AppError";
 import { StatusCodes } from "http-status-codes";
 import path from "node:path";
@@ -28,8 +28,8 @@ interface EmailOptions {
         contentType: string;
     }[];
 }
-    
-export const sendEmail = async ({subject, to, templateName, templateData, attachments}: EmailOptions) => {
+
+export const sendEmail = async ({ subject, to, templateName, templateData, attachments }: EmailOptions) => {
     try {
         const templatePath = path.resolve(process.cwd(), `src/app/templates/${templateName}.ejs`);
         const html = await ejs.renderFile(templatePath, templateData);
@@ -37,7 +37,7 @@ export const sendEmail = async ({subject, to, templateName, templateData, attach
             from: `"DocScheduleBD" <${envVars.EMAIL_USER}>`,
             to: to,
             subject: subject,
-            html : html,
+            html: html,
             attachments: attachments?.map((attachment) => ({
                 filename: attachment.filename,
                 content: attachment.content,
@@ -46,7 +46,7 @@ export const sendEmail = async ({subject, to, templateName, templateData, attach
         });
         console.log(`Email sending successfully to ${to} with subject ${subject} message id ${info.messageId} and response ${info.response}`);
         return info;
-    } catch (error : any) {
+    } catch (error: any) {
         console.log('Email sending failed', error.message);
         throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, error.message);
     }

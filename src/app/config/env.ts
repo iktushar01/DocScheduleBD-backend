@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { StatusCodes } from "http-status-codes";
 import { SignOptions } from "jsonwebtoken";
 
-import AppError from "../app/errorHelpers/AppError";
+import AppError from "../errorHelpers/AppError";
 dotenv.config()
 
 // CLOUDINARY_CLOUD_NAME=dfoqasqnw
@@ -32,7 +32,7 @@ interface EnvConfig {
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string;
     GOOGLE_CALLBACK_URL: string;
-    CLOUDINARY:{
+    CLOUDINARY: {
         CLOUDINARY_CLOUD_NAME: string;
         CLOUDINARY_API_KEY: string;
         CLOUDINARY_API_SECRET: string;
@@ -65,7 +65,7 @@ const requiredEnvVariables = [
     "CLOUDINARY_CLOUD_NAME",
     "CLOUDINARY_API_KEY",
     "CLOUDINARY_API_SECRET",
-    
+
 ];
 
 

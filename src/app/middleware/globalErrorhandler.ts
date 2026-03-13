@@ -1,16 +1,28 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
-import { StatusCodes } from "http-status-codes";
 import z from "zod";
+import { envVars } from "../config/env";
 import AppError from "../errorHelpers/AppError";
-import { envVars } from "../../config/env";
+import { deleteFileFromCloudinary } from "../config/cloudinaryConfig";
+import { StatusCodes } from "http-status-codes";
 import handleZodError from "../errorHelpers/handlezoderror";
 import { TErrorResponse, TErrorSource } from "../interfaces/error.interfaces";
 
+
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const globalErrorhandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+export const globalErrorHandler = async (err: any, req: Request, res: Response, next: NextFunction) => {
     if (envVars.NODE_ENV === 'development') {
         console.log("Error from Global Error Handler", err);
+    }
+
+    if(req.file){
+        await deleteFileFromCloudinary(req.file.path)
+    }
+
+    if(req.files && Array.isArray(req.files) && req.files.length > 0){
+        const imageUrls = req.files.map((file) => file.path);
+        await Promise.all(imageUrls.map(url => deleteFileFromCloudinary(url))); 
     }
 
     let errorSources: TErrorSource[] = []
@@ -20,7 +32,7 @@ export const globalErrorhandler = (err: any, req: Request, res: Response, next: 
 
     //Zod Error Patttern
     /*
-     error.issues;
+     error.issues; 
     /* [
       {
         expected: 'string',
@@ -34,7 +46,7 @@ export const globalErrorhandler = (err: any, req: Request, res: Response, next: 
         path: [ 'xp' ],
         message: 'Invalid input: expected number'
       }
-    ]
+    ] 
     */
 
     if (err instanceof z.ZodError) {

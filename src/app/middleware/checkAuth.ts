@@ -5,7 +5,7 @@ import { jwtUtils } from "../utils/jwt";
 import { cookieUtils } from "../utils/cookies";
 import { Role, UserStatus } from "../../generated/prisma";
 import { StatusCodes } from "http-status-codes";
-import { envVars } from "../../config/env";
+import { envVars } from "../config/env";
 
 export const checkAuth = (...authRoles: Role[]) => async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -61,9 +61,9 @@ export const checkAuth = (...authRoles: Role[]) => async (req: Request, res: Res
                 }
 
                 req.user = {
-                    userId : user.id,
-                    role : user.role,
-                    email : user.email,
+                    userId: user.id,
+                    role: user.role,
+                    email: user.email,
                 }
             }
 

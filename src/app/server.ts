@@ -1,6 +1,6 @@
 import app from "./app";
 import dotenv from "dotenv";
-import { envVars } from "../config/env";
+import { envVars } from "./config/env";
 
 dotenv.config();
 

@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { envVars } from "../../config/env";
+import { envVars } from "../config/env";
 import { cookieUtils } from "./cookies";
 import { jwtUtils } from "./jwt";
 import { JwtPayload } from "jsonwebtoken";
