@@ -5,7 +5,7 @@ import { DoctorService } from "./doctor.service";
 import { Request, Response } from "express";
 
 const getAllDoctors = catchAsync(async (req: Request, res: Response) => {
-    const result = await DoctorService.getAllDoctors();
+    const result = await DoctorService.getAllDoctors(req.query as any);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
