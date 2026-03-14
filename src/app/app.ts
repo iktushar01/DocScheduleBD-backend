@@ -10,6 +10,8 @@ import { envVars } from "./config/env";
 import { globalErrorHandler } from "./middleware/globalErrorhandler";
 import qs from "qs";
 import { PaymentController } from "./module/payment/payment.controller";
+import cron from "node-cron";
+import { AppointmentService } from "./module/appointment/appointment.service";
 const app = express();
 
 
@@ -25,6 +27,15 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }))
+
+cron.schedule("*/25 * * * *", async () => {
+    try {
+        console.log("Running cron job to cancel unpaid appointments...");
+        await AppointmentService.cancelUnpaidAppointments();
+    } catch (error : any) {
+        console.error("Error occurred while canceling unpaid appointments:", error.message);    
+    }
+})
 
 app.use("/api/auth", toNodeHandler(auth))
 
