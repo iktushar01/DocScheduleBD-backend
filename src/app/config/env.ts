@@ -5,9 +5,6 @@ import { SignOptions } from "jsonwebtoken";
 import AppError from "../errorHelpers/AppError";
 dotenv.config()
 
-// CLOUDINARY_CLOUD_NAME=dfoqasqnw
-// CLOUDINARY_API_KEY=623237359597455
-// CLOUDINARY_API_SECRET=slUp60h8sEIFyUkrcbVo-stjP_I
 
 interface EnvConfig {
     PORT: string;
@@ -41,6 +38,8 @@ interface EnvConfig {
         STRIPE_SECRET_KEY: string;
         STRIPE_WEBHOOK_SECRET_KEY: string;
     }
+    SUPER_ADMIN_EMAIL: string;
+    SUPER_ADMIN_PASSWORD: string;
 }
 
 const requiredEnvVariables = [
@@ -71,6 +70,8 @@ const requiredEnvVariables = [
     "CLOUDINARY_API_SECRET",
     "STRIPE_SECRET_KEY",
     "STRIPE_WEBHOOK_SECRET_KEY",
+    "SUPER_ADMIN_EMAIL",
+    "SUPER_ADMIN_PASSWORD",
 ];
 
 
@@ -112,7 +113,9 @@ const loadEnvVariables = (): EnvConfig => {
         STRIPE: {
             STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
             STRIPE_WEBHOOK_SECRET_KEY: process.env.STRIPE_PUBLISHABLE_KEY as string,
-        }
+        },
+        SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
+        SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string,
     }
 }
 

@@ -1,21 +1,12 @@
-/*
-  Warnings:
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('PATIENT', 'DOCTOR', 'ADMIN', 'SUPER_ADMIN');
 
-  - You are about to drop the column `totalReviews` on the `doctor` table. All the data in the column will be lost.
-  - You are about to drop the column `failedLoginAttempts` on the `user` table. All the data in the column will be lost.
-  - You are about to drop the column `lastIpAddress` on the `user` table. All the data in the column will be lost.
-  - You are about to drop the column `lastLogin` on the `user` table. All the data in the column will be lost.
-  - You are about to drop the column `lastUserAgent` on the `user` table. All the data in the column will be lost.
-  - You are about to drop the column `lockedUntil` on the `user` table. All the data in the column will be lost.
-  - You are about to drop the `doctor_speciality` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `specialities` table. If the table is not empty, all the data it contains will be lost.
-  - A unique constraint covering the columns `[registrationNumber]` on the table `doctor` will be added. If there are existing duplicate values, this will fail.
-  - Made the column `registrationNumber` on table `doctor` required. This step will fail if there are existing NULL values in that column.
-  - Made the column `qualification` on table `doctor` required. This step will fail if there are existing NULL values in that column.
-  - Made the column `currentWorkingPlace` on table `doctor` required. This step will fail if there are existing NULL values in that column.
-  - Made the column `designation` on table `doctor` required. This step will fail if there are existing NULL values in that column.
+-- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'SUSPENDED', 'DELETED');
 
-*/
+-- CreateEnum
+CREATE TYPE "Gender" AS ENUM ('MALE', 'FEMALE', 'OTHER');
+
 -- CreateEnum
 CREATE TYPE "BloodGroup" AS ENUM ('A_POSITIVE', 'A_NEGATIVE', 'B_POSITIVE', 'B_NEGATIVE', 'AB_POSITIVE', 'AB_NEGATIVE', 'O_POSITIVE', 'O_NEGATIVE');
 
@@ -24,38 +15,6 @@ CREATE TYPE "AppointmentStatus" AS ENUM ('SCHEDULED', 'INPROGRESS', 'COMPLETED',
 
 -- CreateEnum
 CREATE TYPE "PaymentStatus" AS ENUM ('PAID', 'UNPAID');
-
--- DropForeignKey
-ALTER TABLE "doctor_speciality" DROP CONSTRAINT "doctor_speciality_doctorId_fkey";
-
--- DropForeignKey
-ALTER TABLE "doctor_speciality" DROP CONSTRAINT "doctor_speciality_specialityId_fkey";
-
--- Fill NULL values before making columns NOT NULL
-UPDATE "doctor" SET "registrationNumber" = 'UNKNOWN-' || id WHERE "registrationNumber" IS NULL;
-UPDATE "doctor" SET "qualification" = 'Not specified' WHERE "qualification" IS NULL;
-UPDATE "doctor" SET "currentWorkingPlace" = 'Not specified' WHERE "currentWorkingPlace" IS NULL;
-UPDATE "doctor" SET "designation" = 'Not specified' WHERE "designation" IS NULL;
-
--- AlterTable
-ALTER TABLE "doctor" DROP COLUMN "totalReviews",
-ALTER COLUMN "registrationNumber" SET NOT NULL,
-ALTER COLUMN "qualification" SET NOT NULL,
-ALTER COLUMN "currentWorkingPlace" SET NOT NULL,
-ALTER COLUMN "designation" SET NOT NULL;
-
--- AlterTable
-ALTER TABLE "user" DROP COLUMN "failedLoginAttempts",
-DROP COLUMN "lastIpAddress",
-DROP COLUMN "lastLogin",
-DROP COLUMN "lastUserAgent",
-DROP COLUMN "lockedUntil";
-
--- DropTable
-DROP TABLE "doctor_speciality";
-
--- DropTable
-DROP TABLE "specialities";
 
 -- CreateTable
 CREATE TABLE "specialties" (
@@ -112,6 +71,99 @@ CREATE TABLE "appointments" (
 );
 
 -- CreateTable
+CREATE TABLE "user" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "emailVerified" BOOLEAN NOT NULL DEFAULT false,
+    "image" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "needPasswordChange" BOOLEAN NOT NULL DEFAULT false,
+    "role" "Role" NOT NULL DEFAULT 'PATIENT',
+    "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
+    "failedLoginAttempts" INTEGER NOT NULL DEFAULT 0,
+    "lastIpAddress" TEXT,
+    "lastLogin" TIMESTAMP(3),
+    "lastUserAgent" TEXT,
+    "lockedUntil" TIMESTAMP(3),
+
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "session" (
+    "id" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "token" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "ipAddress" TEXT,
+    "userAgent" TEXT,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "session_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "account" (
+    "id" TEXT NOT NULL,
+    "accountId" TEXT NOT NULL,
+    "providerId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "accessToken" TEXT,
+    "refreshToken" TEXT,
+    "idToken" TEXT,
+    "accessTokenExpiresAt" TIMESTAMP(3),
+    "refreshTokenExpiresAt" TIMESTAMP(3),
+    "scope" TEXT,
+    "password" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "account_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "verification" (
+    "id" TEXT NOT NULL,
+    "identifier" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "verification_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "doctor" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "profilePhoto" TEXT,
+    "contactNumber" TEXT,
+    "address" TEXT,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "deletedAt" TIMESTAMP(3),
+    "registrationNumber" TEXT NOT NULL,
+    "experience" INTEGER NOT NULL DEFAULT 0,
+    "gender" "Gender" NOT NULL,
+    "appointmentFee" DOUBLE PRECISION NOT NULL,
+    "qualification" TEXT NOT NULL,
+    "currentWorkingPlace" TEXT NOT NULL,
+    "designation" TEXT NOT NULL,
+    "averageRating" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "doctor_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "medical_reports" (
     "id" TEXT NOT NULL,
     "reportName" TEXT NOT NULL,
@@ -121,6 +173,23 @@ CREATE TABLE "medical_reports" (
     "patientId" TEXT NOT NULL,
 
     CONSTRAINT "medical_reports_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "patient" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "profilePhoto" TEXT,
+    "contactNumber" TEXT,
+    "address" TEXT,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "deletedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "patient_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -156,6 +225,7 @@ CREATE TABLE "payments" (
     "transactionId" UUID NOT NULL,
     "stripeEventId" TEXT,
     "status" "PaymentStatus" NOT NULL DEFAULT 'UNPAID',
+    "invoiceUrl" TEXT,
     "paymentGatewayData" JSONB,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -260,7 +330,49 @@ CREATE INDEX "appointments_scheduleId_idx" ON "appointments"("scheduleId");
 CREATE INDEX "appointments_status_idx" ON "appointments"("status");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "session_token_key" ON "session"("token");
+
+-- CreateIndex
+CREATE INDEX "session_userId_idx" ON "session"("userId");
+
+-- CreateIndex
+CREATE INDEX "account_userId_idx" ON "account"("userId");
+
+-- CreateIndex
+CREATE INDEX "verification_identifier_idx" ON "verification"("identifier");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "doctor_email_key" ON "doctor"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "doctor_registrationNumber_key" ON "doctor"("registrationNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "doctor_userId_key" ON "doctor"("userId");
+
+-- CreateIndex
+CREATE INDEX "idx_doctor_email" ON "doctor"("email");
+
+-- CreateIndex
+CREATE INDEX "idx_doctor_isDeleted" ON "doctor"("isDeleted");
+
+-- CreateIndex
 CREATE INDEX "medical_reports_patientId_idx" ON "medical_reports"("patientId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "patient_email_key" ON "patient"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "patient_userId_key" ON "patient"("userId");
+
+-- CreateIndex
+CREATE INDEX "idx_patient_email" ON "patient"("email");
+
+-- CreateIndex
+CREATE INDEX "idx_patient_isDeleted" ON "patient"("isDeleted");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "patient_health_data_patientId_key" ON "patient_health_data"("patientId");
@@ -313,9 +425,6 @@ CREATE INDEX "doctor_schedules_doctorId_idx" ON "doctor_schedules"("doctorId");
 -- CreateIndex
 CREATE INDEX "doctor_schedules_scheduleId_idx" ON "doctor_schedules"("scheduleId");
 
--- CreateIndex
-CREATE UNIQUE INDEX "doctor_registrationNumber_key" ON "doctor"("registrationNumber");
-
 -- AddForeignKey
 ALTER TABLE "doctor_specialties" ADD CONSTRAINT "doctor_specialties_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "doctor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -326,16 +435,28 @@ ALTER TABLE "doctor_specialties" ADD CONSTRAINT "doctor_specialties_specialtyId_
 ALTER TABLE "admins" ADD CONSTRAINT "admins_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "appointments" ADD CONSTRAINT "appointments_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "patient"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "appointments" ADD CONSTRAINT "appointments_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "doctor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "appointments" ADD CONSTRAINT "appointments_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "doctor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "appointments" ADD CONSTRAINT "appointments_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "patient"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "appointments" ADD CONSTRAINT "appointments_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "schedules"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "doctor" ADD CONSTRAINT "doctor_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "medical_reports" ADD CONSTRAINT "medical_reports_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "patient"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "patient" ADD CONSTRAINT "patient_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "patient_health_data" ADD CONSTRAINT "patient_health_data_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "patient"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -347,34 +468,22 @@ ALTER TABLE "payments" ADD CONSTRAINT "payments_appointmentId_fkey" FOREIGN KEY 
 ALTER TABLE "prescriptions" ADD CONSTRAINT "prescriptions_appointmentId_fkey" FOREIGN KEY ("appointmentId") REFERENCES "appointments"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "prescriptions" ADD CONSTRAINT "prescriptions_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "patient"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "prescriptions" ADD CONSTRAINT "prescriptions_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "doctor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "prescriptions" ADD CONSTRAINT "prescriptions_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "doctor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "prescriptions" ADD CONSTRAINT "prescriptions_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "patient"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "reviews" ADD CONSTRAINT "reviews_appointmentId_fkey" FOREIGN KEY ("appointmentId") REFERENCES "appointments"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "reviews" ADD CONSTRAINT "reviews_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "patient"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "reviews" ADD CONSTRAINT "reviews_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "doctor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "reviews" ADD CONSTRAINT "reviews_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "doctor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "reviews" ADD CONSTRAINT "reviews_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "patient"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "doctor_schedules" ADD CONSTRAINT "doctor_schedules_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "doctor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "doctor_schedules" ADD CONSTRAINT "doctor_schedules_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "schedules"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- RenameIndex
-ALTER INDEX "doctor_email_idx" RENAME TO "idx_doctor_email";
-
--- RenameIndex
-ALTER INDEX "doctor_isDeleted_idx" RENAME TO "idx_doctor_isDeleted";
-
--- RenameIndex
-ALTER INDEX "patient_email_idx" RENAME TO "idx_patient_email";
-
--- RenameIndex
-ALTER INDEX "patient_isDeleted_idx" RENAME TO "idx_patient_isDeleted";
