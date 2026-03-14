@@ -2,7 +2,6 @@ import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { IndexRoute } from "./routes";
-// import { globalErrorhandler } from "./middleware/globalErrorhandler";
 import { notFound } from "./middleware/notFound";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
@@ -10,6 +9,7 @@ import path from "node:path";
 import { envVars } from "./config/env";
 import { globalErrorHandler } from "./middleware/globalErrorhandler";
 import qs from "qs";
+import { PaymentController } from "./module/payment/payment.controller";
 const app = express();
 
 
