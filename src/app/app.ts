@@ -9,8 +9,11 @@ import { auth } from "./lib/auth";
 import path from "node:path";
 import { envVars } from "./config/env";
 import { globalErrorHandler } from "./middleware/globalErrorhandler";
+import qs from "qs";
 const app = express();
 
+
+app.set("query parser", (str : string) => qs.parse(str));
 app.set("view engine", "ejs");
 app.set("views", path.resolve(process.cwd(), `src/app/templates`))
 
