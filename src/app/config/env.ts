@@ -39,7 +39,7 @@ interface EnvConfig {
     }
     STRIPE: {
         STRIPE_SECRET_KEY: string;
-        STRIPE_PUBLISHABLE_KEY: string;
+        STRIPE_WEBHOOK_SECRET_KEY: string;
     }
 }
 
@@ -70,7 +70,7 @@ const requiredEnvVariables = [
     "CLOUDINARY_API_KEY",
     "CLOUDINARY_API_SECRET",
     "STRIPE_SECRET_KEY",
-    "STRIPE_PUBLISHABLE_KEY",
+    "STRIPE_WEBHOOK_SECRET_KEY",
 ];
 
 
@@ -111,7 +111,7 @@ const loadEnvVariables = (): EnvConfig => {
         },
         STRIPE: {
             STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
-            STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY as string,
+            STRIPE_WEBHOOK_SECRET_KEY: process.env.STRIPE_PUBLISHABLE_KEY as string,
         }
     }
 }

@@ -10,6 +10,7 @@
     "start": "node dist/app/server.js",
     "build": "tsc",
     "lint": "eslint ./src/**/*",
+    "stripe:webhook": "stripe listen --forward-to localhost:5000/webhook",
     "dev": "tsx watch src/app/server.ts"
   },
   "dependencies": {
