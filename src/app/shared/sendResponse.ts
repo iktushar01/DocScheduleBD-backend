@@ -5,12 +5,19 @@ interface ISendResponse<T> {
     success: boolean;
     data?: T;
     message?: string;
+    meta?: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
 }
 
 export const sendResponse = <T>(res: Response, data: ISendResponse<T>) => {
     res.status(data.statusCode).json({
         success: data.success,
-        data: data.data,
         message: data.message,
+        meta: data.meta,
+        data: data.data,
     });
 }
