@@ -308,7 +308,8 @@ exports.Prisma.PrescriptionScalarFieldEnum = {
   updatedAt: 'updatedAt',
   appointmentId: 'appointmentId',
   patientId: 'patientId',
-  doctorId: 'doctorId'
+  doctorId: 'doctorId',
+  pdfUrl: 'pdfUrl'
 };
 
 exports.Prisma.ReviewScalarFieldEnum = {
