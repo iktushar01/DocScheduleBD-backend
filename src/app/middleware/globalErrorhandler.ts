@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import z from "zod";
-import { Prisma } from "../../generated/prisma/client";
+import { Prisma } from "../../generated/prisma";
 import { envVars } from "../config/env";
 import AppError from "../errorHelpers/AppError";
 import { StatusCodes } from "http-status-codes";
